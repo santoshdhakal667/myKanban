@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"example.com/kanban/models"
+	model "example.com/kanban/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +16,7 @@ import (
 // The function returns a JSON response with the boards data or an error message.
 func GetBoard(c *gin.Context) {
 	// Retrieve a list of boards from the database.
-	boards, err := models.GetBoard(20)
+	boards, err := model.GetBoard(20)
 	if err != nil {
 		// If retrieval fails, log the error and terminate the application.
 		log.Fatal(err)
@@ -43,7 +43,7 @@ func GetBoardByID(c *gin.Context) {
 	id := c.Param("id")
 
 	// Retrieve the board from the database using the provided ID.
-	board, err := models.GetBoardByID(id)
+	board, err := model.GetBoardByID(id)
 	if err != nil {
 		// If retrieval fails, log the error and terminate the application.
 		log.Fatal(err)
@@ -68,7 +68,7 @@ func GetBoardByID(c *gin.Context) {
 // The function returns a JSON response with the status and a message indicating the result.
 func PostBoard(c *gin.Context) {
 	// Initialize a variable to hold the JSON body parsed into a Board struct.
-	var json models.Board
+	var json model.Board
 
 	// Parse the JSON request body into the Board struct.
 	if err := c.ShouldBindJSON(&json); err != nil {
@@ -83,7 +83,7 @@ func PostBoard(c *gin.Context) {
 	log.Println(json)
 
 	// Attempt to create the new board in the database using the provided data.
-	success, err := models.PostBoard(json)
+	success, err := model.PostBoard(json)
 	if success {
 		// If the creation is successful, respond with a 200 OK status and a success message.
 		c.JSON(http.StatusOK, gin.H{"success": success})
@@ -106,7 +106,7 @@ The function returns a JSON response with the status and a message indicating th
 */
 func PutBoard(c *gin.Context) {
 	// Initialize a variable to hold the JSON body parsed into a Board struct.
-	var json models.Board
+	var json model.Board
 
 	// Parse the JSON request body into the Board struct.
 	if err := c.ShouldBindJSON(&json); err != nil {
@@ -124,7 +124,7 @@ func PutBoard(c *gin.Context) {
 	}
 
 	// Attempt to update the board in the database using the provided data and ID.
-	success, err := models.PutBoard(json, boardID)
+	success, err := model.PutBoard(json, boardID)
 	if success {
 		// If the update is successful, respond with a 200 OK status and a success message.
 		c.JSON(http.StatusOK, gin.H{"message": "Success"})
@@ -150,7 +150,7 @@ func DeleteBoardByID(c *gin.Context) {
 	}
 
 	// Attempt to delete the board from the database using the provided ID.
-	success, err := models.DeleteBoard(boardID)
+	success, err := model.DeleteBoard(boardID)
 	if success {
 		// If the deletion is successful, respond with a 200 OK status and a success message.
 		c.JSON(http.StatusOK, gin.H{"message": "Board deleted successfully"})

@@ -8,7 +8,7 @@ import (
 	"database/sql"
 
 	"example.com/kanban/handlers"
-	"example.com/kanban/models"
+	model "example.com/kanban/model"
 
 	"github.com/gin-gonic/gin"
 
@@ -30,7 +30,7 @@ func connectDatabase() error {
 		return err
 	}
 
-	models.DB = db
+	model.DB = db
 	return nil
 }
 
