@@ -7,7 +7,7 @@ dev:
 migrate:
 	@
 
-backend:
+backend: build
 	@./bin/backend
 
 generate-bindata:
