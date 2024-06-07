@@ -1,0 +1,4 @@
+/log/*.log
+/tmp
+.air.toml
+.DS_Store
