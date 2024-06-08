@@ -1,22 +1,30 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"log"
 	"os"
 
-	"database/sql"
-
+	migrator "example.com/kanban/database/migration"
 	"example.com/kanban/handlers"
 	model "example.com/kanban/model"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/go-sql-driver/mysql"
+	"database/sql"
+
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 var DB *sql.DB
+
+const migrationsDir = "database/migration"
+
+//go:embed database/migration/*.sql
+var MigrationsFS embed.FS
 
 func checkErr(err error) {
 	if err != nil {
@@ -34,31 +42,29 @@ func connectDatabase() error {
 	return nil
 }
 
-var db *sql.DB
-
 func main() {
-	// Capture connection properties.
-	cfg := mysql.Config{
-		User:   "kanban",
-		Passwd: "bw1qJGj",
-		// User:   os.Getenv("DBUSER"),
-		// Passwd: os.Getenv("DBPASS"),
-		Net:    "tcp",
-		Addr:   "127.0.0.1:3306",
-		DBName: "kanban",
-	}
-	// Get a database handle.
-	var err error
-	db, err = sql.Open("mysql", cfg.FormatDSN())
+
+	// --- (1) ----
+	// Recover Migrator
+	migrator := migrator.MustGetNewMigrator(MigrationsFS, migrationsDir)
+
+	// --- (2.1) ----
+	// Get the DB instance
+	connectionStr := "kanban:bw1qJGj@tcp(127.0.0.1:6000)/kanban?multiStatements=true"
+	conn, err := sql.Open("mysql", connectionStr)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
+	}
+	defer conn.Close()
+
+	// --- (2) ----
+	// Apply migrations
+	err = migrator.ApplyMigrations(conn)
+	if err != nil {
+		panic(err)
 	}
 
-	pingErr := db.Ping()
-	if pingErr != nil {
-		log.Fatal(pingErr)
-	}
-	fmt.Println("Connected!")
+	fmt.Printf("Migrations applied!!\n")
 
 	LOG_FILE := "./log/output.log"
 	logFile, err := os.OpenFile(LOG_FILE, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
@@ -68,9 +74,6 @@ func main() {
 	defer logFile.Close()
 	log.SetOutput(logFile)
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
-
-	// err = connectDatabase()
-	// checkErr(err)
 
 	router := gin.Default()
 	v1 := router.Group("/api/v1")
@@ -93,7 +96,6 @@ func main() {
 		v1.DELETE("/boards/:id", func(c *gin.Context) {
 			handlers.DeleteBoardByID(c)
 		})
-
 	}
 
 	router.Run("localhost:9090")

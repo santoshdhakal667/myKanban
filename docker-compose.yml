@@ -1,6 +1,5 @@
 services:
-  db:
-    container_name: kanban-db
+  mysql:
     image: mysql:lts
     environment:
       MYSQL_ROOT_PASSWORD: supersecret
@@ -8,15 +7,10 @@ services:
       MYSQL_USER: kanban
       MYSQL_PASSWORD: bw1qJGj
     ports:
-      - 3306:3306
+      - 6000:3306
     volumes:
       - kanban-mysql-data:/var/lib/mysql
-    networks:
-      - kanban-network
+    restart: always
 
 volumes:
   kanban-mysql-data:
-
-networks:
-  kanban-network:
-    driver: bridge
