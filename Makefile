@@ -14,7 +14,7 @@ migration_down: compose
 	migrate -path database/migration/ -database "mysql://kanban:bw1qJGj@tcp(127.0.0.1:6000)/kanban?multiStatements=true" -verbose down
 
 migration_fix: compose
-	migrate -path database/migration/ -database "mysql://kanban:bw1qJGj@tcp(127.0.0.1:6000)/kanban?multiStatements=true" force VERSION
+	migrate -path database/migration/ -database "mysql://kanban:bw1qJGj@tcp(127.0.0.1:6000)/kanban?multiStatements=true" force ${VERSION}
 
 backend: build
 	@./bin/backend
