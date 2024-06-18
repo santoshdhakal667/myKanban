@@ -1,0 +1,49 @@
+@import '~bootstrap/scss/bootstrap.scss';
+
+// .card{
+//  
+//  cursor: grab;
+//  &:hover{
+//   box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+//  }
+// }
+.card {
+ cursor: grab;
+ box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+ &.close{
+  &:hover {
+    box-shadow: rgba(50, 205, 50, 0.25) 0px 6px 12px -2px, rgba(0, 128, 128, 0.3) 0px 3px 7px -3px; /* Adjusted green tint on hover */
+  }
+ }
+ &.open{ 
+   &:hover {
+    box-shadow: rgba(0, 0, 255, 0.25) 0px 6px 12px -2px, rgba(0, 0, 255, 0.3) 0px 3px 7px -3px; /* Adjusted blue tint on hover */
+  }
+ }
+}
+
+h2{
+ &.title-text{
+  padding: 20px 10px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+  border-radius: 5px;
+  font-size: 45px;
+  color: white;
+  text-shadow: 0 1px 0 #ccc,
+               0 2px 0 #c9c9c9,
+               0 3px 0 #bbb,
+               0 4px 0 #b9b9b9,
+               0 5px 0 #aaa,
+               0 6px 1px rgba(0,0,0,.1),
+               0 0 5px rgba(0,0,0,.1),
+               0 1px 3px rgba(0,0,0,.3),
+               0 3px 5px rgba(0,0,0,.2),
+               0 5px 10px rgba(0,0,0,.25),
+               0 10px 10px rgba(0,0,0,.2),
+               0 20px 20px rgba(0,0,0,.15);
+ }
+}
+
+.card_wrap{
+ padding: 40px 10px;
+}
