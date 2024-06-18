@@ -2,6 +2,7 @@ package controller
 
 import (
 	"log"
+	"net/http"
 
 	"example.com/kanban/entity"
 	"example.com/kanban/service"
@@ -13,6 +14,7 @@ type BoardController interface {
 	// Needs JSON object and should return slice but the previous tutorial return only one
 	ShowByID(ctx *gin.Context) entity.Board
 	Create(ctx *gin.Context) entity.Board
+	Update(ctx *gin.Context) entity.Board
 }
 
 type boardController struct {
@@ -50,4 +52,24 @@ func (bc *boardController) Create(ctx *gin.Context) entity.Board {
 		log.Println(err)
 	}
 	return board
+}
+
+func (bc *boardController) Update(ctx *gin.Context) entity.Board {
+	var json entity.Board
+
+	if err := ctx.ShouldBindJSON(&json); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return entity.Board{}
+	}
+
+	id := ctx.Param("id")
+
+	success, err := bc.service.Update(json, id)
+	if success {
+		ctx.JSON(http.StatusOK, gin.H{"message": "Board updated successfully"})
+		return json
+	} else {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return entity.Board{}
+	}
 }

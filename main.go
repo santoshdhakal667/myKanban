@@ -32,6 +32,9 @@ func main() {
 	router.POST("/boards", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, BoardController.Create(ctx))
 	})
+	router.PUT("/boards/:id", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, BoardController.Update(ctx))
+	})
 
 	router.Run("localhost:9000")
 }
