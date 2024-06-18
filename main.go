@@ -26,6 +26,9 @@ func main() {
 	router.GET("/boards", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, BoardController.Show())
 	})
+	router.GET("/boards/:id", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, BoardController.ShowByID(ctx))
+	})
 	router.POST("/boards", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, BoardController.Create(ctx))
 	})

@@ -1,13 +1,15 @@
 package service
 
 import (
+	"database/sql"
+
 	"example.com/kanban/database"
 	"example.com/kanban/entity"
 )
 
 type BoardService interface {
 	Show() ([]entity.Board, error)
-	// ShowByID(id string) ([]entity.Board, error)
+	ShowByID(id string) (entity.Board, error)
 	Create(entity.Board) (entity.Board, error)
 }
 
@@ -50,14 +52,24 @@ func (bs *boardService) Show() ([]entity.Board, error) {
 	return bs.boards, nil
 }
 
-// func (bs *boardService) ShowByID(id string) (entity.Board, error) {
-// 	stmt, err := database.DB.Prepare("SELECT id, status, name FROM boards WHERE id = ?")
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (bs *boardService) ShowByID(id string) (entity.Board, error) {
+	var board entity.Board
+	stmt, err := database.DB.Prepare("SELECT id, status, name FROM boards WHERE id = ?")
+	if err != nil {
+		return entity.Board{}, err
+	}
+	defer stmt.Close()
 
-// 	sqlE
-// }
+	sqlErr := stmt.QueryRow(id).Scan(&board.ID, &board.Status, &board.Name)
+
+	if sqlErr != nil {
+		if sqlErr == sql.ErrNoRows {
+			return entity.Board{}, nil
+		}
+		return entity.Board{}, sqlErr
+	}
+	return board, nil
+}
 
 func (bs *boardService) Create(board entity.Board) (entity.Board, error) {
 	tx, err := database.DB.Begin()

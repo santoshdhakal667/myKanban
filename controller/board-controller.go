@@ -11,6 +11,7 @@ import (
 type BoardController interface {
 	Show() []entity.Board
 	// Needs JSON object and should return slice but the previous tutorial return only one
+	ShowByID(ctx *gin.Context) entity.Board
 	Create(ctx *gin.Context) entity.Board
 }
 
@@ -26,6 +27,15 @@ func NewBoardConstructor(service service.BoardService) BoardController {
 
 func (bc *boardController) Show() []entity.Board {
 	boards, err := bc.service.Show()
+	if err != nil {
+		log.Println(err)
+	}
+	return boards
+}
+
+func (bc *boardController) ShowByID(ctx *gin.Context) entity.Board {
+	id := ctx.Param("id")
+	boards, err := bc.service.ShowByID(id)
 	if err != nil {
 		log.Println(err)
 	}

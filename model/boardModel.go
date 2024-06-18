@@ -1,7 +1,7 @@
 package model
 
 import (
-	"strconv"
+	"database/sql"
 
 	"example.com/kanban/database"
 	_ "github.com/go-sql-driver/mysql"
@@ -13,49 +13,24 @@ type Board struct {
 	Name   string `json:"name"`
 }
 
-func GetBoard(count int) ([]Board, error) {
-	rows, err := database.DB.Query("SELECT id, status, name FROM boards LIMIT " + strconv.Itoa(count))
-	// rows, err := DB.Query("SELECT id, status, name FROM boards LIMIT " + strconv.Itoa(count))
+func GetBoardByID(id string) (Board, error) {
+	stmt, err := database.DB.Prepare("SELECT id, status, name from boards WHERE id = ?")
 	if err != nil {
-		return nil, err
+		return Board{}, err
 	}
 
-	defer rows.Close()
+	singleBoard := Board{}
 
-	boards := make([]Board, 0)
+	sqlErr := stmt.QueryRow(id).Scan(&singleBoard.ID, &singleBoard.Status, &singleBoard.Name)
 
-	for rows.Next() {
-		singleBoard := Board{}
-		err = rows.Scan(&singleBoard.ID, &singleBoard.Status, &singleBoard.Name)
-
-		if err != nil {
-			return nil, err
+	if sqlErr != nil {
+		if sqlErr == sql.ErrNoRows {
+			return Board{}, nil
 		}
-
-		boards = append(boards, singleBoard)
+		return Board{}, sqlErr
 	}
-
-	return boards, err
+	return singleBoard, nil
 }
-
-// func GetBoardByID(id string) (Board, error) {
-// 	stmt, err := DB.Prepare("SELECT id, status, name from boards WHERE id = ?")
-// 	if err != nil {
-// 		return Board{}, err
-// 	}
-
-// 	singleBoard := Board{}
-
-// 	sqlErr := stmt.QueryRow(id).Scan(&singleBoard.ID, &singleBoard.Status, &singleBoard.Name)
-
-// 	if sqlErr != nil {
-// 		if sqlErr == sql.ErrNoRows {
-// 			return Board{}, nil
-// 		}
-// 		return Board{}, sqlErr
-// 	}
-// 	return singleBoard, nil
-// }
 
 // func DeleteBoard(boardID int) (bool, error) {
 // 	tx, err := DB.Begin()
