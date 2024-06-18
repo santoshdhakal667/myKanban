@@ -14,59 +14,65 @@ type BoardService interface {
 }
 
 type boardService struct {
-	boards []entity.Board
+	boards       []entity.Board
+	showStmt     *sql.Stmt
+	showByIDStmt *sql.Stmt
+	createStmt   *sql.Stmt
 }
 
-func NewBoardConstructor() BoardService {
-	return &boardService{}
+func NewBoardConstructor() (BoardService, error) {
+	showStmt, err := database.DB.Prepare("SELECT id, status, name FROM boards LIMIT 100")
+	if err != nil {
+		return nil, err
+	}
+	showByIDStmt, err := database.DB.Prepare("SELECT id, status, name FROM boards WHERE id = ?")
+	if err != nil {
+		return nil, err
+	}
+	createStmt, err := database.DB.Prepare("INSERT INTO boards (status, name) VALUES (?, ?)")
+	if err != nil {
+		return nil, err
+	}
+	return &boardService{
+		boards:       []entity.Board{},
+		showStmt:     showStmt,
+		showByIDStmt: showByIDStmt,
+		createStmt:   createStmt,
+	}, nil
 }
 
 func (bs *boardService) Show() ([]entity.Board, error) {
-	// Initialize the boards slice if it's nil
-	if bs.boards == nil {
-		bs.boards = []entity.Board{}
-	}
-
-	// Execute the query
-	rows, err := database.DB.Query("SELECT id, status, name FROM boards LIMIT 100")
+	rows, err := bs.showStmt.Query()
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	// Iterate over the result set
+	var boards []entity.Board
 	for rows.Next() {
 		var board entity.Board
 		err = rows.Scan(&board.ID, &board.Status, &board.Name)
 		if err != nil {
 			return nil, err
 		}
-		bs.boards = append(bs.boards, board)
+		boards = append(boards, board)
 	}
 
-	// Check for errors from iterating over rows
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return bs.boards, nil
+	return boards, nil
 }
 
 func (bs *boardService) ShowByID(id string) (entity.Board, error) {
 	var board entity.Board
-	stmt, err := database.DB.Prepare("SELECT id, status, name FROM boards WHERE id = ?")
+	err := bs.showByIDStmt.QueryRow(id).Scan(&board.ID, &board.Status, &board.Name)
 	if err != nil {
-		return entity.Board{}, err
-	}
-	defer stmt.Close()
-
-	sqlErr := stmt.QueryRow(id).Scan(&board.ID, &board.Status, &board.Name)
-
-	if sqlErr != nil {
-		if sqlErr == sql.ErrNoRows {
+		if err == sql.ErrNoRows {
 			return entity.Board{}, nil
 		}
-		return entity.Board{}, sqlErr
+		return entity.Board{}, err
 	}
 	return board, nil
 }
@@ -76,19 +82,21 @@ func (bs *boardService) Create(board entity.Board) (entity.Board, error) {
 	if err != nil {
 		return entity.Board{}, err
 	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p) // re-throw after rollback
+		} else if err != nil {
+			tx.Rollback() // err is non-nil; don't change it
+		} else {
+			err = tx.Commit() // err is nil; if Commit returns error update err
+		}
+	}()
 
-	stmt, err := tx.Prepare("INSERT INTO boards (status, name) VALUES (?, ?)")
+	_, err = bs.createStmt.Exec(board.Status, board.Name)
 	if err != nil {
 		return entity.Board{}, err
 	}
 
-	defer stmt.Close()
-
-	_, err = stmt.Exec(board.Status, board.Name)
-	if err != nil {
-		return entity.Board{}, err
-	}
-
-	tx.Commit()
 	return board, nil
 }
