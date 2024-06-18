@@ -1,10 +1,13 @@
 package main
 
 import (
+	"embed"
+	"fmt"
 	"net/http"
 
 	"example.com/kanban/controller"
 	"example.com/kanban/database"
+	migrator "example.com/kanban/database/migration"
 	"example.com/kanban/service"
 
 	"github.com/gin-gonic/gin"
@@ -19,8 +22,22 @@ var (
 	BoardController controller.BoardController = controller.NewBoardConstructor(boardService)
 )
 
+const migrationsDir = "database/migration/"
+
+//go:embed database/migration/*.sql
+var MigrationFS embed.FS
+
 func main() {
 	database.DBConnection()
+
+	migration := migrator.MustGetNewMigrator(MigrationFS, "database/migration")
+	err := migration.ApplyMigrations(database.DB)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Migrations applied!!")
+
 	router := gin.Default()
 
 	router.GET("/boards", func(ctx *gin.Context) {

@@ -3,6 +3,8 @@ package database
 import (
 	"database/sql"
 	"log"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var DB *sql.DB
@@ -15,11 +17,9 @@ func DBConnection() {
 		panic(err.Error())
 	}
 
-	// defer db.Close()
-
 	if err = DB.Ping(); err != nil {
 		panic("Failed to ping database: " + err.Error())
 	} else {
-		log.Println("Succesfully pinged database")
+		log.Println("Successfully pinged database")
 	}
 }
