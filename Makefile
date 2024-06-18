@@ -1,6 +1,10 @@
 build:
 	@go build -o ./bin/backend .
 
+build_linux:
+	@GOOS=linux GOARCH=amd64 go build -o ./bin/backend_linux .
+	# @GOOS=darwin GOARCH=arm64
+
 compose:
 	@docker compose up -d
 
