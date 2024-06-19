@@ -22,7 +22,7 @@ var (
 	BoardController controller.BoardController = controller.NewBoardConstructor(boardService)
 )
 
-const migrationsDir = "database/migration/"
+const migrationsDir = "database/migration"
 
 //go:embed database/migration/*.sql
 var MigrationFS embed.FS
