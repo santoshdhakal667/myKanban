@@ -2,6 +2,7 @@ package service
 
 import (
 	"database/sql"
+	"log"
 
 	"example.com/kanban/database"
 	"example.com/kanban/entity"
@@ -12,6 +13,7 @@ type BoardService interface {
 	ShowByID(id string) (entity.Board, error)
 	Create(entity.Board) (entity.Board, error)
 	Update(json entity.Board, id string) (bool, error)
+	Delete(id string) (entity.Board, error)
 }
 
 type boardService struct {
@@ -22,7 +24,22 @@ func NewBoardConstructor() BoardService {
 	return &boardService{}
 }
 
+func CheckDBConnection() error {
+	if err := database.DB.Ping(); err != nil {
+		log.Println("Database connection lost, reconnecting...")
+		database.DBConnection() // Reconnect
+		if err := database.DB.Ping(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (bs *boardService) Show() ([]entity.Board, error) {
+	err := CheckDBConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
 	// Initialize the boards slice if it's nil
 	if bs.boards == nil {
 		bs.boards = []entity.Board{}
@@ -33,7 +50,7 @@ func (bs *boardService) Show() ([]entity.Board, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	// defer rows.Close()
 
 	// Iterate over the result set
 	for rows.Next() {
@@ -119,4 +136,30 @@ func (bs *boardService) Update(json entity.Board, id string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func (bs *boardService) Delete(id string) (entity.Board, error) {
+	var board entity.Board
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return entity.Board{}, err
+	}
+
+	stmt, err := tx.Prepare("DELETE FROM boards WHERE id = ?")
+	if err != nil {
+		return entity.Board{}, err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(board.ID)
+	if err != nil {
+		return entity.Board{}, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return entity.Board{}, err
+	}
+	return board, err
 }

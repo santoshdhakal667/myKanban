@@ -30,7 +30,7 @@ var MigrationFS embed.FS
 func main() {
 	database.DBConnection()
 
-	migration := migrator.MustGetNewMigrator(MigrationFS, "database/migration")
+	migration := migrator.MustGetNewMigrator(MigrationFS, migrationsDir)
 	err := migration.ApplyMigrations(database.DB)
 	if err != nil {
 		panic(err)
@@ -51,6 +51,9 @@ func main() {
 	})
 	router.PUT("/boards/:id", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, BoardController.Update(ctx))
+	})
+	router.DELETE("/boards/:id", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, BoardController.Delete(ctx))
 	})
 
 	router.Run("localhost:9000")

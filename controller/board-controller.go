@@ -15,6 +15,7 @@ type BoardController interface {
 	ShowByID(ctx *gin.Context) entity.Board
 	Create(ctx *gin.Context) entity.Board
 	Update(ctx *gin.Context) entity.Board
+	Delete(ctx *gin.Context) entity.Board
 }
 
 type boardController struct {
@@ -72,4 +73,13 @@ func (bc *boardController) Update(ctx *gin.Context) entity.Board {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return entity.Board{}
 	}
+}
+
+func (bc *boardController) Delete(ctx *gin.Context) entity.Board {
+	id := ctx.Param("id")
+	boards, err := bc.service.Delete(id)
+	if err != nil {
+		log.Println(err)
+	}
+	return boards
 }

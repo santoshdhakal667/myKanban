@@ -8,9 +8,9 @@ import (
 )
 
 var DB *sql.DB
-var err error
 
 func DBConnection() {
+	var err error
 	DB, err = sql.Open("mysql", "kanban:bw1qJGj@tcp(127.0.0.1:6000)/kanban?multiStatements=true")
 
 	if err != nil {

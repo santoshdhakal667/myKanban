@@ -1,2 +1,0 @@
--- Add utils.go file
-- This should have a function for logging to output.log
