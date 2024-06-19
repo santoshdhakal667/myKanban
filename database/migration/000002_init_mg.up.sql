@@ -1,5 +1,0 @@
-CREATE TABLE cards (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    status VARCHAR(255)
-);
