@@ -125,7 +125,7 @@ func (bs *boardService) Update(json entity.Board, id string) (bool, error) {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(json.Status, json.Name, json.ID)
+	_, err = stmt.Exec(json.Status, json.Name, id)
 	if err != nil {
 		tx.Rollback()
 		return false, err
@@ -139,20 +139,24 @@ func (bs *boardService) Update(json entity.Board, id string) (bool, error) {
 }
 
 func (bs *boardService) Delete(id string) (entity.Board, error) {
+	err := CheckDBConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
 	var board entity.Board
 	tx, err := database.DB.Begin()
 	if err != nil {
 		return entity.Board{}, err
 	}
 
-	stmt, err := tx.Prepare("DELETE FROM boards WHERE id = ?")
+	stmt, err := tx.Prepare("UPDATE boards SET deleted_at = NOW() WHERE id = ?")
 	if err != nil {
 		return entity.Board{}, err
 	}
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(board.ID)
+	_, err = stmt.Exec(id)
 	if err != nil {
 		return entity.Board{}, err
 	}
