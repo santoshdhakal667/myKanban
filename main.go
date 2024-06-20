@@ -28,7 +28,7 @@ const migrationsDir = "database/migration"
 var MigrationFS embed.FS
 
 func main() {
-	database.DBConnection()
+	database.InitDB()
 
 	migration := migrator.MustGetNewMigrator(MigrationFS, migrationsDir)
 	err := migration.ApplyMigrations(database.DB)
