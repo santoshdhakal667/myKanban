@@ -2,7 +2,6 @@ package service
 
 import (
 	"database/sql"
-	"log"
 
 	"example.com/kanban/database"
 	"example.com/kanban/entity"
@@ -24,22 +23,7 @@ func NewBoardConstructor() BoardService {
 	return &boardService{}
 }
 
-func CheckDBConnection() error {
-	if err := database.DB.Ping(); err != nil {
-		log.Println("Database connection lost, reconnecting...")
-		database.DBConnection() // Reconnect
-		if err := database.DB.Ping(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (bs *boardService) Show() ([]entity.Board, error) {
-	err := CheckDBConnection()
-	if err != nil {
-		log.Fatal(err)
-	}
 	// Initialize the boards slice if it's nil
 	if bs.boards == nil {
 		bs.boards = []entity.Board{}
@@ -139,10 +123,6 @@ func (bs *boardService) Update(json entity.Board, id string) (bool, error) {
 }
 
 func (bs *boardService) Delete(id string) (entity.Board, error) {
-	err := CheckDBConnection()
-	if err != nil {
-		log.Fatal(err)
-	}
 	var board entity.Board
 	tx, err := database.DB.Begin()
 	if err != nil {
