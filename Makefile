@@ -23,6 +23,9 @@ migration_fix: compose
 backend: build
 	@./bin/backend
 
+run_backend: compose
+	@./bin/backend_linux
+
 generate-bindata:
 	@go-bindata -o ./database/db.go -prefix "./database" -pkg init.sql ./database
 	

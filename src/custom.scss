@@ -1,15 +1,9 @@
 @import '~bootstrap/scss/bootstrap.scss';
 
-// .card{
-//  
-//  cursor: grab;
-//  &:hover{
-//   box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
-//  }
-// }
 .card {
  cursor: grab;
- box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+ border: none;
+ box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
  &.close{
   &:hover {
     box-shadow: rgba(50, 205, 50, 0.25) 0px 6px 12px -2px, rgba(0, 128, 128, 0.3) 0px 3px 7px -3px; /* Adjusted green tint on hover */
@@ -20,15 +14,45 @@
     box-shadow: rgba(0, 0, 255, 0.25) 0px 6px 12px -2px, rgba(0, 0, 255, 0.3) 0px 3px 7px -3px; /* Adjusted blue tint on hover */
   }
  }
+ &-body{
+  .card{
+    &-title{
+      font-size: 18px;
+      font-weight: 700;
+    }
+    &-text{
+      font-size: 14px;
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+  }
+  .tag{
+    font-size: 10px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 10px;
+    margin-right: 5px;
+    display: inline-block;
+    &.info{
+      background-color: rgba(violet, 0.09);
+      color: violet;
+    }
+    &.status{
+      background-color: rgba(green, 0.09);
+      color: green;
+    }
+  }
+ }
 }
 
 h2{
  &.title-text{
-  padding: 20px 10px;
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+  padding: 10px 0;
   border-radius: 5px;
-  font-size: 45px;
+  font-size: 24px;
+  text-align: start;
   color: white;
+  margin-bottom: 0;
   text-shadow: 0 1px 0 #ccc,
                0 2px 0 #c9c9c9,
                0 3px 0 #bbb,
@@ -41,9 +65,25 @@ h2{
                0 5px 10px rgba(0,0,0,.25),
                0 10px 10px rgba(0,0,0,.2),
                0 20px 20px rgba(0,0,0,.15);
+               .count{
+                text-shadow: none;
+                color: #202020;
+                background-color: gainsboro;
+                padding: 10px;
+                height: 30px;
+                width: 30px;
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+               }
  }
 }
 
 .card_wrap{
- padding: 40px 10px;
+ padding: 10px;
 }
+
+// card label
+
